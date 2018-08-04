@@ -1,0 +1,47 @@
+﻿CONFIG_DEFAULT_PASSWORD=ktopenstack 
+CONFIG_CEILOMETER_INSTALL=n 
+CONFIG_AODH_INSTALL=n 
+CONFIG_NTP_SERVERS=kr.pool.ntp.org  
+CONFIG_CONTROLLER_HOST=172.25.0.10 
+CONFIG_COMPUTE_HOSTS=172.25.0.10,172.25.0.11 
+CONFIG_KEYSTONE_ADMIN_PW=ktopenstack 
+CONFIG_NEUTRON_OVS_BRIDGE_MAPPINGS=extnet:br-ex 
+CONFIG_NEUTRON_OVS_BRIDGE_IFACES=br-ex:ens33 
+CONFIG_NEUTRON_OVS_TUNNEL_IF=ens34 
+CONFIG_PROVISION_DEMO=n
+
+openstack token issue
+openstack project create --description project_cli project1
+openstack user create --project project1 --password-prompt user1
+openstack role add --project project1 --user user1 _member_
+openstack image create --file /root/CentOS-7-x86_64-GenericCloud.qcow2 --disk-format qcow2 --public --unprotected image1
+openstack flavor create --id auto --vcpus 1 --ram 1024 --disk 15  --public m2.small
+openstack network create --project admin --external --provider-network-type flat --provider-physical-network extnet external1
+openstack subnet create --subnet-range 172.25.0.0/24 --no-dhcp --gateway=172.25.0.2 --network external1  --allocation-pool start=172.25.0.50,end=172.25.0.100  external1_subnet
+
+openstack network create --internal internal1
+openstack subnet create --network internal1 --dhcp --subnet-range 10.0.0.0/24 internal1_subnet
+openstack router create router1
+openstack router set --external-gateway external1 router1
+openstack router add subnet router1 internal1_subnet
+openstack floating ip create external1
+openstack floating ip create external1
+openstack security group create "sec1"
+openstack security group rule create --protocol icmp --ingress "sec1"
+openstack security group rule create --protocol tcp --dst-port 80 --ingress "sec1"
+openstack security group rule create --protocol tcp --dst-port 22 --ingress "sec1"
+openstack keypair create key1 > /root/key1.pem
+
+openstack server create --image image1 --flavor m2.small --security-group sec1 --key-name key1 --nic net-id=internal1 --config-drive true instance1
+openstack server add floating ip instance1 172.25.0.52
+
+openstack volume create --size 10 --type iscsi --image image1 root-volume
+openstack volume create --size 5 --type iscsi data-volume
+openstack server add volume instance1 root-volume
+openstack server add volume instance1 data-volume
+
+openstack volume snapshot create --force --volume data-volume snaphot1
+openstack container create container1
+openstack object create container1 document1.txt
+
+
