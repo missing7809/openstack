@@ -1,4 +1,13 @@
-﻿CONFIG_DEFAULT_PASSWORD=ktopenstack 
+
+hostname
+hosts
+ipaddr
+
+selinux disabled
+systemctl disable NetworkManager
+systemctl disable firewalld
+
+CONFIG_DEFAULT_PASSWORD=ktopenstack 
 CONFIG_CEILOMETER_INSTALL=n 
 CONFIG_AODH_INSTALL=n 
 CONFIG_NTP_SERVERS=kr.pool.ntp.org  
